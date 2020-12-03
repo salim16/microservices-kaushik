@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.4.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>io.javabrains</groupId>
+	<artifactId>discovery-server</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>discovery-server</name>
+	<description>Eureka Discovery Server</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<!-- With type pom import and scope , what then happens is that all the 
+		dependencies defined in the dependencyManagement section of the spring-cloud-dependencies 
+		artifactId(project) are included in your POM's dependencyManagement section. 
+		You can then reference these dependencies in the dependency section of your 
+		POM (and all of its child POMs) without having to include a version etc. -->
+
+	<!-- However, if in your POM you simply define a normal dependency to spring-cloud-dependencies 
+		artifactId(project) then all dependencies from the dependency section of 
+		the spring-cloud-dependencies artifactId(project) are included transitively 
+		in your project - however the dependencies defined in the dependencyManagement 
+		section of the spring-cloud-dependencies artifactId(project) are not included at all. -->
+		
+	<!-- Dependency Management tag is used to consolidate all the dependencies 
+		It is generally defined in the parent pom project and all the dependencies 
+		defined inside the dependency management tag are defined along with their 
+		versions also, hence all the dependencies are downloaded on the parent project. 
+		Now in order to use the dependencies in the child projects you need to define 
+		the dependency again in child projects but now "without any version". Hence 
+		in this way all the dependencies are consolidated. In this project we have 
+		dependency management tag, this project can now act as parent pom for other 
+		child projects. -->
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
