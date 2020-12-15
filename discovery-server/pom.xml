@@ -51,13 +51,13 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<!-- With type pom import and scope , what then happens is that all the 
+	<!-- With type pom and scope import, what then happens is that all the 
 		dependencies defined in the dependencyManagement section of the spring-cloud-dependencies 
 		artifactId(project) are included in your POM's dependencyManagement section. 
 		You can then reference these dependencies in the dependency section of your 
 		POM (and all of its child POMs) without having to include a version etc. -->
 
-	<!-- However, if in your POM you simply define a normal dependency to spring-cloud-dependencies 
+	<!-- However, if in your POM you simply define a normal dependency of spring-cloud-dependencies 
 		artifactId(project) then all dependencies from the dependency section of 
 		the spring-cloud-dependencies artifactId(project) are included transitively 
 		in your project - however the dependencies defined in the dependencyManagement 

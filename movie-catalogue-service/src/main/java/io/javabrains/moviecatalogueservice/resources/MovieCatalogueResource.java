@@ -26,14 +26,23 @@ public class MovieCatalogueResource {
 	@RequestMapping("/{userId}")
 	public List<CatalogueItem> getCatalogue(String userId) {
 
-		// Get All the movie Id's that user has rated.
-		UserRating userRating = restTemplate.getForObject("http://localhost:8083/ratingsdata/users/" + userId, UserRating.class);
-
+		// Get All the movie's that user has rated.
+		// This will directly call the microservice without asking for the microservice from the service discovery,
+		// @LoadBalanced is not needed on your restTemplate/webClient, if you provide @LoadBalanced to your rest template/webclient 
+		// with this kind of URL it will not find the instance of microservice, and exception will  be thrown,
+		// this url calling is like your are simply calling the microservice directly. -> not recommended
+		// UserRating userRating = restTemplate.getForObject("http://localhost:8083/ratingsdata/users/" + userId, UserRating.class);
+		
+		// This will first ask for the microservice from the service discovery, and then call the microservice.
+		// For this to work @LoadBalanced annotation is necessary on your restTemplate/webClient, @LoadBalanced will first ask for the microservice 
+		// from the service discovery and then call the microservice in a load balanced way if there are more than one instance of that microservice.
+		UserRating userRating = restTemplate.getForObject("http://RATINGS-DATA-SERVICE/ratingsdata/users/" + userId, UserRating.class);
+		
 		// For each movie ID, call movie info service and get movie details.
 		return userRating.getUserRating().stream().map(rating -> {
 			
 			// using RestTemplate
-			Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
+			Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
 			
 			// using WebClient - WebClient is kind of asynchronous
 //			Movie movie = webClientBuilder.build()
@@ -48,7 +57,7 @@ public class MovieCatalogueResource {
 
 		// ######################################################### Notes #########################################################
 		// For service discovery we will be using eureka server.
-		// For creating eureka server we will have to create a seperate spring boot project, here we have created the project with the
+		// For creating eureka server we will have to create a separate spring boot project, here we have created the project with the
 		// name discovery-server.
 		// This project will have a dependency called spring-cloud-starter-netflix-eureka-server
 		// Rest all the 3 projects will have eureka client dependency.
@@ -87,5 +96,18 @@ public class MovieCatalogueResource {
 		// the port of eureka server in the application.properties file in the client applications.
 		// @EnableEurekaClient annotation is optional. It is just a marker annotation, with no significance.
 		
+		// Hardcoded URL's are bad.
+		// Because when microservices are deployed, you will never know what the URL of the microservice would be on the cloud, hence hardcoding urls is bad, also 
+		// when there are more than 1 instance of any microservice, there will be more than one urls so which url will you hardcode. Also when there  is more than 1 
+		// instance of a microservice you will need loadbalancing.
+		
+		// There is one dependency of repository in  client projects in pom, if something doesnt work look kaushiks lectutre number 20.
+		
+		// To see load-balancing in action, run one more instance of movie info service from the command line, by using the below command, after running the below
+		// command two instances of movie-info-service would be visible on eureka server localhost:8761
+		
+		// java -Dserver.port=8201 -jar movie-info-service-0.0.1-SNAPSHOT.jar
+		
 	}
 }
+
