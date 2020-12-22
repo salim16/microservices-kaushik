@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -22,6 +23,11 @@ public class MovieCatalogueResource {
 
 	@Autowired
 	private RestTemplate restTemplate;
+	
+	// DiscoveryClient is a custom method for service discovery, where you want to perform load balance yourself, you may call getInstances method to get the instances,
+	// this is not recommended
+	@Autowired
+	private DiscoveryClient discoveryClient;
 
 	@RequestMapping("/{userId}")
 	public List<CatalogueItem> getCatalogue(String userId) {
@@ -107,6 +113,8 @@ public class MovieCatalogueResource {
 		// command two instances of movie-info-service would be visible on eureka server localhost:8761
 		
 		// java -Dserver.port=8201 -jar movie-info-service-0.0.1-SNAPSHOT.jar
+		
+		// Apart from this to manage faults, the eureka clients need to send heartbeats to eureka server informing the eureka server that i am still alive. 
 		
 	}
 }
